@@ -60,3 +60,19 @@
     background-color: transparent;
     border: none;
 }
+
+.ChatList{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ContainerCard{
+    width: 95%;
+    margin-top: 10px;
+}
+
+.Card{
+    margin-bottom: 20px;
+}
