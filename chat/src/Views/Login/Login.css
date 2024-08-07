@@ -1,0 +1,26 @@
+.LoginNavbar{
+    background-color: #00A884;
+    height: 27vh;
+}
+
+.Container{
+    background-color: #F0F2F5;
+    height: 70vh;
+    width: 65%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.Container h1{
+    text-align: center;
+    margin-top: 7%;
+}
+
+.Form{
+    position: absolute;
+    top: 57%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
