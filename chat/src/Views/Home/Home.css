@@ -14,7 +14,9 @@
 }
 
 .ChatNavbar{
-    height: 95vh;
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
     width: 4%;
     background-color: #F0F2F5;
 }
@@ -33,4 +35,28 @@
     font-weight: bold;
     margin-top: 3%;
     margin-left: 5%;
+}
+
+.ChatIcon{
+    margin-top: 15px;
+}
+
+.ChatIcon, .ContactsIcon, .GroupsIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.SettingsIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    margin-top: auto;
+}
+
+.iconButton {
+    background-color: transparent;
+    border: none;
 }
