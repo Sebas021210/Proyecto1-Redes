@@ -7,7 +7,9 @@ function Home() {
             <div className="Navbar"></div>
             <div className="Chat">
                 <div className="ChatNavbar"></div>
-                <div className="ChatMessages"></div>
+                <div className="ChatMessages">
+                    <h4>Chats</h4>
+                </div>
             </div>
         </div>
     );

@@ -28,3 +28,9 @@
     left: 19%;
     transform: translate(-50%, -50%);
 }
+
+.ChatMessages h4{
+    font-weight: bold;
+    margin-top: 3%;
+    margin-left: 5%;
+}
