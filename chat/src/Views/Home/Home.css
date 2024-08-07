@@ -1,0 +1,30 @@
+.Navbar{
+    background-color: #00A884;
+    height: 15vh;
+}
+
+.Chat{
+    background-color: #F0F2F5;
+    height: 95vh;
+    width: 97%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ChatNavbar{
+    height: 95vh;
+    width: 4%;
+    background-color: #F0F2F5;
+}
+
+.ChatMessages{
+    height: 95vh;
+    width: 30%;
+    background-color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 19%;
+    transform: translate(-50%, -50%);
+}
