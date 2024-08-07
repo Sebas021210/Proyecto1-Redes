@@ -76,3 +76,7 @@
 .Card{
     margin-bottom: 20px;
 }
+
+.Card:hover{
+    cursor: pointer;
+}

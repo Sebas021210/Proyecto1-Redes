@@ -1,7 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Icon from '@mdi/react';
 import ChatCard from "../../Components/Card/Card";
+import Icon from '@mdi/react';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { mdiMessageText } from '@mdi/js';
 import { mdiContacts } from '@mdi/js';
 import { mdiAccountGroup } from '@mdi/js';
@@ -10,10 +12,20 @@ import './Home.css';
 
 function Home() {
     const navigate = useNavigate();
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
 
     const handleLogout = () => {
         navigate('/');
     }
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     return (
         <div className="Home">
@@ -36,41 +48,55 @@ function Home() {
                         </button>
                     </div>
                     <div className="SettingsIcon">
-                        <button className="iconButton" onClick={handleLogout} >
+                        <button className="iconButton" onClick={handleClick} >
                             <Icon path={mdiCog} size={1.2} color="#7B8990" />
                         </button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            MenuListProps={{
+                                'aria-labelledby': 'basic-button',
+                            }}
+                            style={{ marginLeft: '40px' }}
+                        >
+                            <MenuItem onClick={handleLogout}>Cerras sesión</MenuItem>
+                            <MenuItem onClick={handleClose}>Eliminar cuenta</MenuItem>
+                        </Menu>
                     </div>
                 </div>
                 <div className="ChatMessages">
                     <h4>Chats</h4>
+                    
                     <div className="ChatList">
                         <div className="ContainerCard">
                             <div className="Card">
-                                <ChatCard 
+                                <ChatCard
                                     name="Sebas"
                                     status="Activo"
                                 />
                             </div>
                             <div className="Card">
-                                <ChatCard 
+                                <ChatCard
                                     name="Manuel"
                                     status="Desconectado"
                                 />
                             </div>
                             <div className="Card">
-                                <ChatCard 
+                                <ChatCard
                                     name="Master"
                                     status="Activo"
                                 />
                             </div>
                             <div className="Card">
-                                <ChatCard 
+                                <ChatCard
                                     name="Valdez"
                                     status="Activo"
                                 />
                             </div>
                             <div className="Card">
-                                <ChatCard 
+                                <ChatCard
                                     name="Tiviet"
                                     status="Ausente"
                                 />
