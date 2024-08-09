@@ -14,6 +14,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { client } from '@xmpp/client';
+//import debug from '@xmpp/debug';
 import './Login.css';
 
 function Login() {
@@ -35,8 +36,8 @@ function Login() {
             console.error('❌', err.toString());
         });
 
-        xmppClient.on('online', adress => {
-            console.log('🟢', 'online as', adress.toString());
+        xmppClient.on('online', address => {
+            console.log('🟢', 'online as', address.toString());
             navigate('/home');
         });
 
@@ -53,7 +54,7 @@ function Login() {
 
     const handleClickClose = () => {
         setOpen(false);
-    }
+    };
 
     return (
         <div className="Login">
@@ -113,7 +114,7 @@ function Login() {
                                     onSubmit: (event) => {
                                         event.preventDefault();
                                         handleClickClose();
-                                      }, 
+                                    }, 
                                 }}
                             >
                                 <DialogTitle>Registrarse</DialogTitle>
