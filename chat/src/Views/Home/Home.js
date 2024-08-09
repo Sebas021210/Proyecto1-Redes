@@ -13,6 +13,7 @@ import './Home.css';
 function Home() {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [rotateCog, setRotateCog] = React.useState(false);
     const open = Boolean(anchorEl);
 
     const handleLogout = () => {
@@ -21,10 +22,12 @@ function Home() {
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
+        setRotateCog(!rotateCog);
     };
 
     const handleClose = () => {
         setAnchorEl(null);
+        setRotateCog(false);
     };
 
     return (
@@ -48,8 +51,8 @@ function Home() {
                         </button>
                     </div>
                     <div className="SettingsIcon">
-                        <button className="iconButton" onClick={handleClick} >
-                            <Icon path={mdiCog} size={1.2} color="#7B8990" />
+                        <button className="iconButton" onClick={handleClick} style={{ transform: rotateCog ? 'rotate(60deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} >
+                            <Icon path={mdiCog} size={1.2}  color="#7B8990" />
                         </button>
                         <Menu
                             id="basic-menu"

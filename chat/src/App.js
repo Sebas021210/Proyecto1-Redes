@@ -7,7 +7,7 @@ import "./App.css";
 function App() {
   return (
     <div className="App">
-      <Router>
+      <Router /*basename="/chat/dist_react/index.html"*/>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
