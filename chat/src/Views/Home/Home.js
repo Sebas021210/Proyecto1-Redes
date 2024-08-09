@@ -8,6 +8,7 @@ import { mdiMessageText } from '@mdi/js';
 import { mdiContacts } from '@mdi/js';
 import { mdiAccountGroup } from '@mdi/js';
 import { mdiCog } from '@mdi/js';
+import { client, xml } from '@xmpp/client';
 import './Home.css';
 
 function Home() {
@@ -16,9 +17,60 @@ function Home() {
     const [rotateCog, setRotateCog] = React.useState(false);
     const open = Boolean(anchorEl);
 
+    const userConnected = localStorage.getItem('user');
+    const passwordConnected = localStorage.getItem('password');
+
     const handleLogout = () => {
-        navigate('/');
+        const xmppClient = client();
+        xmppClient.stop();
+        console.log('🔴', 'offline');
+        navigate('/', { replace: true });
     }
+
+    const handleDeleteAccount = async () => {
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
+    
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+    
+        xmppClient.on('online', async () => {
+            console.log('🟢', 'online as', xmppClient.jid.toString());
+    
+            try {
+                const deleteIQ = xml(
+                    'iq',
+                    { type: 'set', id: 'delete1' },
+                    xml('query', { xmlns: 'jabber:iq:register' }, xml('remove'))
+                );
+    
+                const response = await xmppClient.send(deleteIQ);
+    
+                if (response) {
+                    console.log('🟢 Respuesta del servidor:', response.toString());
+                } else {
+                    console.warn('⚠️ No se recibió respuesta del servidor o respuesta vacía');
+                }
+    
+                xmppClient.stop();
+                console.log('🔴 Cliente desconectado');
+                navigate('/', { replace: true });
+            } catch (err) {
+                console.error('❌ Error al eliminar la cuenta:', err.toString());
+            }
+        });
+    
+        try {
+            await xmppClient.start();
+        } catch (err) {
+            console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
+        }
+    };    
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -65,7 +117,7 @@ function Home() {
                             style={{ marginLeft: '40px' }}
                         >
                             <MenuItem onClick={handleLogout}>Cerras sesión</MenuItem>
-                            <MenuItem onClick={handleClose}>Eliminar cuenta</MenuItem>
+                            <MenuItem onClick={handleDeleteAccount}>Eliminar cuenta</MenuItem>
                         </Menu>
                     </div>
                 </div>
@@ -76,7 +128,7 @@ function Home() {
                         <div className="ContainerCard">
                             <div className="Card">
                                 <ChatCard
-                                    name="Sebas"
+                                    name={userConnected}
                                     status="Activo"
                                 />
                             </div>

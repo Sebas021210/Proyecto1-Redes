@@ -38,7 +38,9 @@ function Login() {
 
         xmppClient.on('online', address => {
             console.log('🟢', 'online as', address.toString());
-            navigate('/home');
+            navigate('/home', { replace: true });
+            localStorage.setItem('user', user);
+            localStorage.setItem('password', password);
         });
 
         try {
