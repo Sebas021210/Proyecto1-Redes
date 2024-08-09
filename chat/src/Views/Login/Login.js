@@ -8,6 +8,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import LockIcon from '@mui/icons-material/Lock';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import { client } from '@xmpp/client';
 import './Login.css';
 
@@ -16,6 +21,7 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
+    const [open, setOpen] = useState(false);
 
     const handleLogin = async () => {
         const xmppClient = client({
@@ -40,6 +46,14 @@ function Login() {
             console.error('❌', err.toString());
         }
     };
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClickClose = () => {
+        setOpen(false);
+    }
 
     return (
         <div className="Login">
@@ -83,12 +97,41 @@ function Login() {
 
                         <br />
 
-                        <div className="ButtonLogin" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <div className="ButtonLogin">
                             <Button onClick={handleLogin} style={{ height: "55px", width: "150px", backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }}>
                                 Iniciar Sesión
                             </Button>
+
+                            <Button onClick={handleClickOpen} style={{ height: "55px", width: "150px", backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }}>
+                                Registrarse
+                            </Button>
+                            <Dialog
+                                open={open}
+                                onClose={handleClickClose}
+                                PaperProps={{
+                                    component: 'form',
+                                    onSubmit: (event) => {
+                                        event.preventDefault();
+                                        handleClickClose();
+                                      }, 
+                                }}
+                            >
+                                <DialogTitle>Registrarse</DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText>
+                                        ¡Bienvenido a Chat UVG! Por favor ingresa tus datos para registrarte.
+                                    </DialogContentText>
+                                    <TextField autoFocus required margin="dense" id="username" name="username" label="User Name" type="name" fullWidth variant="standard" />
+                                    <TextField autoFocus margin="dense" id="fullName" name="fullName" label="Full Name" type="name" fullWidth variant="standard" />
+                                    <TextField autoFocus margin="dense" id="email" name="email" label="Email Address" type="email" fullWidth variant="standard" />
+                                    <TextField autoFocus required margin="dense" id="passwordRegister" name="passwordRegister" label="Password" type="password" fullWidth variant="standard" />
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleClickClose} style={{ backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }} >Cancelar</Button>
+                                    <Button style={{ backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }} type="submit">Registrarse</Button>
+                                </DialogActions>
+                            </Dialog>
                         </div>
-                        
                     </Form>
                 </div>
             </div>
