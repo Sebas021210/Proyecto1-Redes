@@ -62,7 +62,7 @@ function Login() {
         <div className="Login">
             <div className="LoginNavbar"></div>
             <div className="Container">
-                <h1>¡Bienvenido a Chat UVG!</h1>
+                <h1>Bienvenido a Alumcha.lol</h1>
                 <div className="Form">
                     <Form style={{ width: "50vh" }} >
                         <Form.Group className="mb-3" controlId="formGridName">

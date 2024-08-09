@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
 import Icon from '@mdi/react';
@@ -8,13 +8,14 @@ import { mdiMessageText } from '@mdi/js';
 import { mdiContacts } from '@mdi/js';
 import { mdiAccountGroup } from '@mdi/js';
 import { mdiCog } from '@mdi/js';
+import { mdiAccountStar } from '@mdi/js';
 import { client, xml } from '@xmpp/client';
 import './Home.css';
 
 function Home() {
     const navigate = useNavigate();
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [rotateCog, setRotateCog] = React.useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [rotateCog, setRotateCog] = useState(false);
     const open = Boolean(anchorEl);
 
     const userConnected = localStorage.getItem('user');
@@ -123,12 +124,12 @@ function Home() {
                 </div>
                 <div className="ChatMessages">
                     <h4>Chats</h4>
-                    
+                    <p> <Icon path={mdiAccountStar} size={1} color="#7B8990" /> {userConnected}</p>
                     <div className="ChatList">
                         <div className="ContainerCard">
                             <div className="Card">
                                 <ChatCard
-                                    name={userConnected}
+                                    name="Sebas"
                                     status="Activo"
                                 />
                             </div>
