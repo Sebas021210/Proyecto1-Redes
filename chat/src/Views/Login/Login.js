@@ -13,8 +13,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { client } from '@xmpp/client';
-//import debug from '@xmpp/debug';
+import { client, xml } from '@xmpp/client';
 import './Login.css';
 
 function Login() {
@@ -23,6 +22,8 @@ function Login() {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [open, setOpen] = useState(false);
+    const adminUser = 'sol21826-test1';
+    const adminPassword = '12345';
 
     const handleLogin = async () => {
         const xmppClient = client({
@@ -50,6 +51,60 @@ function Login() {
         }
     };
 
+    const handleRegister = async (event) => {
+        event.preventDefault();
+
+        const newUser = event.target.username.value;
+        const newPassword = event.target.passwordRegister.value;
+
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: adminUser,
+            password: adminPassword,
+        });
+
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+
+        xmppClient.on('online', async () => {
+            console.log('🟢', 'Logged in as admin to register new user');
+
+            try {
+                const registerIQ = xml(
+                    'iq',
+                    { type: 'set', id: 'register1' },
+                    xml('query', { xmlns: 'jabber:iq:register' },
+                        xml('username', {}, newUser),
+                        xml('password', {}, newPassword)
+                    )
+                );
+
+                const response = await xmppClient.send(registerIQ);
+
+                if (response) {
+                    console.log('🟢 Server response:', response.toString())
+                } else {
+                    console.warn('⚠️ No response from server or empty response');
+                }
+
+                console.log('🟢 Registered new user:', newUser);
+                xmppClient.stop();
+                console.log('🔴 Disconnected from server');
+            } catch (err) {
+                console.error('❌ Error registering new user:', err.toString());
+            }
+        });
+
+        try {
+            await xmppClient.start();
+            setOpen(false);
+        } catch (err) {
+            console.error('❌ Error starting XMPP client:', err.toString());
+        }
+    };
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -62,7 +117,7 @@ function Login() {
         <div className="Login">
             <div className="LoginNavbar"></div>
             <div className="Container">
-                <h1>Bienvenido a Alumcha.lol</h1>
+                <h1>Bienvenido a Alumchat.lol</h1>
                 <div className="Form">
                     <Form style={{ width: "50vh" }} >
                         <Form.Group className="mb-3" controlId="formGridName">
@@ -113,10 +168,7 @@ function Login() {
                                 onClose={handleClickClose}
                                 PaperProps={{
                                     component: 'form',
-                                    onSubmit: (event) => {
-                                        event.preventDefault();
-                                        handleClickClose();
-                                    }, 
+                                    onSubmit: handleRegister
                                 }}
                             >
                                 <DialogTitle>Registrarse</DialogTitle>
