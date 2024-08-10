@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
+import ChatDialog from "../../Components/Dialog/Dialog";
 import Icon from '@mdi/react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { mdiMessageText } from '@mdi/js';
-import { mdiContacts } from '@mdi/js';
 import { mdiAccountGroup } from '@mdi/js';
 import { mdiCog } from '@mdi/js';
 import { mdiAccountStar } from '@mdi/js';
@@ -95,7 +95,7 @@ function Home() {
                     </div>
                     <div className="ContactsIcon">
                         <button className="iconButton">
-                            <Icon path={mdiContacts} size={1.2} color="#7B8990" />
+                            <ChatDialog />
                         </button>
                     </div>
                     <div className="GroupsIcon">
@@ -117,7 +117,7 @@ function Home() {
                             }}
                             style={{ marginLeft: '40px' }}
                         >
-                            <MenuItem onClick={handleLogout}>Cerras sesión</MenuItem>
+                            <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
                             <MenuItem onClick={handleDeleteAccount}>Eliminar cuenta</MenuItem>
                         </Menu>
                     </div>
