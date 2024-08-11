@@ -73,6 +73,12 @@
     justify-content: center;
 }
 
+.ChatList p{
+    justify-content: center;
+    align-items: center;
+    margin-left: 0px;
+}
+
 .ContainerCard{
     width: 95%;
     margin-top: 10px;

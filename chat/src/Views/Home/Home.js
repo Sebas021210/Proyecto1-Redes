@@ -1,14 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
-import ChatDialog from "../../Components/Dialog/Dialog";
 import Icon from '@mdi/react';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { mdiMessageText } from '@mdi/js';
-import { mdiAccountGroup } from '@mdi/js';
-import { mdiCog } from '@mdi/js';
-import { mdiAccountStar } from '@mdi/js';
+import { Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
+import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar } from '@mdi/js';
 import { client, xml } from '@xmpp/client';
 import './Home.css';
 
@@ -16,10 +11,30 @@ function Home() {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [rotateCog, setRotateCog] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [contacts, setContacts] = useState([]);
     const open = Boolean(anchorEl);
 
     const userConnected = localStorage.getItem('user');
     const passwordConnected = localStorage.getItem('password');
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+        setRotateCog(!rotateCog);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+        setRotateCog(false);
+    };
+
+    const handleOpenDialog = () => {
+        setOpenDialog(true);
+    }
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    }
 
     const handleLogout = () => {
         const xmppClient = client();
@@ -35,34 +50,139 @@ function Home() {
             username: userConnected,
             password: passwordConnected,
         });
-    
+
         xmppClient.on('error', err => {
             console.error('❌', err.toString());
         });
-    
+
         xmppClient.on('online', async () => {
             console.log('🟢', 'online as', xmppClient.jid.toString());
-    
+
             try {
                 const deleteIQ = xml(
                     'iq',
                     { type: 'set', id: 'delete1' },
                     xml('query', { xmlns: 'jabber:iq:register' }, xml('remove'))
                 );
-    
+
                 const response = await xmppClient.send(deleteIQ);
-    
+
                 if (response) {
                     console.log('🟢 Respuesta del servidor:', response.toString());
                 } else {
                     console.warn('⚠️ No se recibió respuesta del servidor o respuesta vacía');
                 }
-    
+
                 xmppClient.stop();
                 console.log('🔴 Cliente desconectado');
                 navigate('/', { replace: true });
             } catch (err) {
                 console.error('❌ Error al eliminar la cuenta:', err.toString());
+            }
+        });
+
+        try {
+            await xmppClient.start();
+        } catch (err) {
+            console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
+        }
+    };
+
+    const addContact = async (username) => {
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
+
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+
+        xmppClient.on('online', async () => {
+            console.log('🟢', 'online as', xmppClient.jid.toString());
+
+            try {
+                const addContactIQ = xml(
+                    'iq',
+                    { type: 'set', id: 'addContact1' },
+                    xml('query', { xmlns: 'jabber:iq:roster' },
+                        xml('item', { jid: `${username}@alumchat.lol`, name: username })
+                    )
+                );
+
+                await xmppClient.send(addContactIQ);
+                const subscribePresence = xml(
+                    'presence',
+                    { type: 'subscribe', to: `${username}@alumchat.lol` }
+                );
+
+                await xmppClient.send(subscribePresence);
+                console.log('🟢 Contacto agregado:', username);
+                fetchContacts();
+            } catch (err) {
+                console.error('❌ Error al agregar contacto:', err.toString());
+            } finally {
+                xmppClient.stop();
+            }
+        });
+
+        try {
+            await xmppClient.start();
+        } catch (err) {
+            console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
+        }
+    }
+
+    const fetchContacts = useCallback(async () => {
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
+    
+        xmppClient.on('error', err => {
+            console.error('❌ Error en XMPP client:', err.toString());
+        });
+    
+        xmppClient.on('stanza', stanza => {
+            console.log('🔄 Stanza recibida:', stanza.toString());
+    
+            if (stanza.is('iq') && stanza.attrs.id === 'getRoster1' && stanza.attrs.type === 'result') {                
+                const query = stanza.getChild('query', 'jabber:iq:roster');
+                if (!query) {
+                    console.error('❌ No se encontró el elemento <query> en la respuesta.');
+                    return;
+                }
+
+                const contactsList = query.getChildren('item').map(item => ({
+                    name: item.attrs.name || item.attrs.jid.split('@')[0],
+                    jid: item.attrs.jid,
+                    status: 'Offline'
+                }));
+    
+                console.log('Contacts:', contactsList);
+                setContacts(contactsList);
+    
+                xmppClient.stop();
+            }
+        });
+    
+        xmppClient.on('online', async () => {
+            console.log('🟢 Conectado como', xmppClient.jid.toString());
+    
+            try {
+                const getRosterIQ = xml(
+                    'iq',
+                    { type: 'get', id: 'getRoster1' },
+                    xml('query', { xmlns: 'jabber:iq:roster' })
+                );
+    
+                await xmppClient.send(getRosterIQ);
+            } catch (err) {
+                console.error('❌ Error al enviar IQ para obtener el roster:', err.toString());
             }
         });
     
@@ -71,17 +191,18 @@ function Home() {
         } catch (err) {
             console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
         }
-    };    
+    }, [userConnected, passwordConnected]);        
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-        setRotateCog(!rotateCog);
-    };
+    useEffect(() => {
+        fetchContacts();
+    }, [fetchContacts]);
 
-    const handleClose = () => {
-        setAnchorEl(null);
-        setRotateCog(false);
-    };
+    const handleAddContact = async (event) => {
+        event.preventDefault();
+        const username = event.target.usernameContact.value;
+        await addContact(username);
+        handleCloseDialog();
+    }
 
     return (
         <div className="Home">
@@ -94,9 +215,26 @@ function Home() {
                         </button>
                     </div>
                     <div className="ContactsIcon">
-                        <button className="iconButton">
-                            <ChatDialog />
+                        <button className="iconButton" onClick={handleOpenDialog} >
+                            <Icon path={mdiContacts} size={1.2} color="#7B8990" />
                         </button>
+                        <Dialog
+                            open={openDialog}
+                            onClose={handleCloseDialog}
+                            PaperProps={{ component: 'form', onSubmit: handleAddContact, }}
+                        >
+                            <DialogTitle>Contactos</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    Para agregar un contacto, ingresa su nombre de usuario.
+                                </DialogContentText>
+                                <TextField autoFocus required margin="dense" id="usernameContact" name="usernameContact" label="User Name" type="name" fullWidth variant="standard" />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseDialog} style={{ backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }} >Cancelar</Button>
+                                <Button style={{ backgroundColor: "transparent", color: "black", borderColor: "#BCBEC0" }} type="submit">Agregar contacto</Button>
+                            </DialogActions>
+                        </Dialog>
                     </div>
                     <div className="GroupsIcon">
                         <button className="iconButton">
@@ -105,16 +243,14 @@ function Home() {
                     </div>
                     <div className="SettingsIcon">
                         <button className="iconButton" onClick={handleClick} style={{ transform: rotateCog ? 'rotate(60deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} >
-                            <Icon path={mdiCog} size={1.2}  color="#7B8990" />
+                            <Icon path={mdiCog} size={1.2} color="#7B8990" />
                         </button>
                         <Menu
                             id="basic-menu"
                             anchorEl={anchorEl}
                             open={open}
                             onClose={handleClose}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
+                            MenuListProps={{ 'aria-labelledby': 'basic-button', }}
                             style={{ marginLeft: '40px' }}
                         >
                             <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
@@ -126,38 +262,17 @@ function Home() {
                     <h4>Chats</h4>
                     <p> <Icon path={mdiAccountStar} size={1} color="#7B8990" /> {userConnected}</p>
                     <div className="ChatList">
-                        <div className="ContainerCard">
-                            <div className="Card">
-                                <ChatCard
-                                    name="Sebas"
-                                    status="Activo"
-                                />
+                        {console.log('Contacts:', contacts)}
+                        {contacts.length > 0 ? contacts.map(contact => (
+                            <div className="ContainerCard" key={contact.jid}>
+                                <div className="Card">
+                                    <ChatCard
+                                        name={contact.name}
+                                        status={contact.status || 'Offline'}
+                                    />
+                                </div>
                             </div>
-                            <div className="Card">
-                                <ChatCard
-                                    name="Manuel"
-                                    status="Desconectado"
-                                />
-                            </div>
-                            <div className="Card">
-                                <ChatCard
-                                    name="Master"
-                                    status="Activo"
-                                />
-                            </div>
-                            <div className="Card">
-                                <ChatCard
-                                    name="Valdez"
-                                    status="Activo"
-                                />
-                            </div>
-                            <div className="Card">
-                                <ChatCard
-                                    name="Tiviet"
-                                    status="Ausente"
-                                />
-                            </div>
-                        </div>
+                        )) : <p>No se encontraron contactos...</p> }
                     </div>
                 </div>
             </div>
