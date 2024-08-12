@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
 import Icon from '@mdi/react';
 import { Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
-import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar } from '@mdi/js';
+import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar, mdiClose, mdiSend, mdiPaperclip } from '@mdi/js';
 import { client, xml } from '@xmpp/client';
 import './Home.css';
 
@@ -13,6 +13,7 @@ function Home() {
     const [rotateCog, setRotateCog] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [contacts, setContacts] = useState([]);
+    const [selectedContact, setSelectedContact] = useState(null);
     const open = Boolean(anchorEl);
 
     const userConnected = localStorage.getItem('user');
@@ -36,10 +37,21 @@ function Home() {
         setOpenDialog(false);
     }
 
+    const handleCardClick = (contact) => {
+        setSelectedContact(contact);
+    }
+
+    const handleCardClose = () => {
+        setSelectedContact(null);
+    }
+
     const handleLogout = () => {
         const xmppClient = client();
         xmppClient.stop();
         console.log('🔴', 'offline');
+        localStorage.removeItem('user');
+        localStorage.removeItem('password');
+        console.log('xmppClient:', xmppClient);
         navigate('/', { replace: true });
     }
 
@@ -142,15 +154,15 @@ function Home() {
             username: userConnected,
             password: passwordConnected,
         });
-    
+
         xmppClient.on('error', err => {
             console.error('❌ Error en XMPP client:', err.toString());
         });
-    
+
         xmppClient.on('stanza', stanza => {
             console.log('🔄 Stanza recibida:', stanza.toString());
-    
-            if (stanza.is('iq') && stanza.attrs.id === 'getRoster1' && stanza.attrs.type === 'result') {                
+
+            if (stanza.is('iq') && stanza.attrs.id === 'getRoster1' && stanza.attrs.type === 'result') {
                 const query = stanza.getChild('query', 'jabber:iq:roster');
                 if (!query) {
                     console.error('❌ No se encontró el elemento <query> en la respuesta.');
@@ -162,36 +174,36 @@ function Home() {
                     jid: item.attrs.jid,
                     status: 'Offline'
                 }));
-    
+
                 console.log('Contacts:', contactsList);
                 setContacts(contactsList);
-    
+
                 xmppClient.stop();
             }
         });
-    
+
         xmppClient.on('online', async () => {
             console.log('🟢 Conectado como', xmppClient.jid.toString());
-    
+
             try {
                 const getRosterIQ = xml(
                     'iq',
                     { type: 'get', id: 'getRoster1' },
                     xml('query', { xmlns: 'jabber:iq:roster' })
                 );
-    
+
                 await xmppClient.send(getRosterIQ);
             } catch (err) {
                 console.error('❌ Error al enviar IQ para obtener el roster:', err.toString());
             }
         });
-    
+
         try {
             await xmppClient.start();
         } catch (err) {
             console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
         }
-    }, [userConnected, passwordConnected]);        
+    }, [userConnected, passwordConnected]);
 
     useEffect(() => {
         fetchContacts();
@@ -264,7 +276,7 @@ function Home() {
                     <div className="ChatList">
                         {console.log('Contacts:', contacts)}
                         {contacts.length > 0 ? contacts.map(contact => (
-                            <div className="ContainerCard" key={contact.jid}>
+                            <div className="ContainerCard" key={contact.jid} onClick={ () => handleCardClick(contact) } >
                                 <div className="Card">
                                     <ChatCard
                                         name={contact.name}
@@ -272,8 +284,30 @@ function Home() {
                                     />
                                 </div>
                             </div>
-                        )) : <p>No se encontraron contactos...</p> }
+                        )) : <p>No se encontraron contactos...</p>}
                     </div>
+                    {selectedContact && (
+                        <div className="ChatBox">
+                            <div className="ChatBoxHeader">
+                                <h5>{selectedContact.name}</h5>
+                                <button onClick={handleCardClose}>
+                                    <Icon path={mdiClose} size={1} />
+                                </button>
+                            </div>
+                            <div className="ChatBoxMessages">
+                                <p>Messages...</p>
+                            </div>
+                            <div className="ChatBoxInput">
+                                <button className="buttonClip" >
+                                    <Icon path={mdiPaperclip} size={1} />
+                                </button>
+                                <textarea placeholder="Escribe tu mensaje aquí..."></textarea>
+                                <button className="buttonSend" >
+                                    <Icon path={mdiSend} size={1} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
