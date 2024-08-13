@@ -39,6 +39,8 @@ function Login() {
 
         xmppClient.on('online', address => {
             console.log('🟢', 'online as', address.toString());
+            const presence = xml('presence', {}, xml('show', {}, 'chat'), xml('status', {}, 'Disponible'));
+            xmppClient.send(presence);
             navigate('/home', { replace: true });
             localStorage.setItem('user', user);
             localStorage.setItem('password', password);
