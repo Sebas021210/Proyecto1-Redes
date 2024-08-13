@@ -14,6 +14,8 @@ function Home() {
     const [openDialog, setOpenDialog] = useState(false);
     const [contacts, setContacts] = useState([]);
     const [selectedContact, setSelectedContact] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
     const open = Boolean(anchorEl);
 
     const userConnected = localStorage.getItem('user');
@@ -216,6 +218,54 @@ function Home() {
         handleCloseDialog();
     }
 
+    const sendMessages = async (message) => {
+        if (!selectedContact) return;
+
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
+
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+
+        xmppClient.on('online', async () => {
+            try {
+                const messageStanza = xml(
+                    'message',
+                    { type: 'chat', to: selectedContact.jid },
+                    xml('body', {}, message)
+                );
+
+                await xmppClient.send(messageStanza);
+                console.log('🟢 Mensaje enviado:', message);
+                addMessageToChat(selectedContact.jid, message, 'sent');
+            } catch (err) {
+                console.error('❌ Error al enviar mensaje:', err.toString());
+            } finally {
+                xmppClient.stop();
+            }
+        });
+
+        try {
+            await xmppClient.start();
+        } catch (err) {
+            console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
+        }
+    };
+
+    const addMessageToChat = (jid, message, direction) => {
+        setMessages(prevMessages => [...prevMessages, { jid, message, direction }]);
+    };
+
+    const handleSendMessage = () => {
+        sendMessages(newMessage);
+        setNewMessage('');
+    };
+
     return (
         <div className="Home">
             <div className="Navbar"></div>
@@ -276,7 +326,7 @@ function Home() {
                     <div className="ChatList">
                         {console.log('Contacts:', contacts)}
                         {contacts.length > 0 ? contacts.map(contact => (
-                            <div className="ContainerCard" key={contact.jid} onClick={ () => handleCardClick(contact) } >
+                            <div className="ContainerCard" key={contact.jid} onClick={() => handleCardClick(contact)} >
                                 <div className="Card">
                                     <ChatCard
                                         name={contact.name}
@@ -295,14 +345,18 @@ function Home() {
                                 </button>
                             </div>
                             <div className="ChatBoxMessages">
-                                <p>Messages...</p>
+                                {messages.length > 0 ? messages.filter(message => message.jid === selectedContact.jid).map((message, index) => (
+                                    <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'}>
+                                        <p style={{ position: 'relative', top: '15px' }} >{message.message}</p>
+                                    </div>
+                                )) : <p style={{ position: 'relative', top: '15px' }} >No hay mensajes...</p>}
                             </div>
                             <div className="ChatBoxInput">
                                 <button className="buttonClip" >
                                     <Icon path={mdiPaperclip} size={1} />
                                 </button>
-                                <textarea placeholder="Escribe tu mensaje aquí..."></textarea>
-                                <button className="buttonSend" >
+                                <textarea placeholder="Escribe tu mensaje aquí..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)}></textarea>
+                                <button className="buttonSend" onClick={handleSendMessage} >
                                     <Icon path={mdiSend} size={1} />
                                 </button>
                             </div>
