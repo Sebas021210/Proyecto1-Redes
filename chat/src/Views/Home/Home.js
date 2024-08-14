@@ -177,7 +177,7 @@ function Home() {
                     status: 'Offline'
                 }));
 
-                console.log('Contacts:', contactsList);
+                //console.log('Contacts:', contactsList);
                 setContacts(contactsList);
 
                 xmppClient.stop();
@@ -324,13 +324,14 @@ function Home() {
                     <h4>Chats</h4>
                     <p> <Icon path={mdiAccountStar} size={1} color="#7B8990" /> {userConnected}</p>
                     <div className="ChatList">
-                        {console.log('Contacts:', contacts)}
+                        {/*{console.log('Contacts:', contacts)}*/}
                         {contacts.length > 0 ? contacts.map(contact => (
                             <div className="ContainerCard" key={contact.jid} onClick={() => handleCardClick(contact)} >
                                 <div className="Card">
                                     <ChatCard
                                         name={contact.name}
-                                        status={contact.status || 'Offline'}
+                                        status={contact.status}
+                                        jid = {contact.jid}
                                     />
                                 </div>
                             </div>
