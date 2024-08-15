@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
 import DropdownStatus from "../../Components/Dropdown/Dropdown";
+import Notification from "../../Components/Notification/Notification";
 import Icon from '@mdi/react';
 import { Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
 import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar, mdiClose, mdiSend, mdiPaperclip } from '@mdi/js';
@@ -304,6 +305,9 @@ function Home() {
                             <Icon path={mdiAccountGroup} size={1.2} color="#7B8990" />
                         </button>
                     </div>
+                    <div className="NotificationIcon">
+                        <Notification />
+                    </div>
                     <div className="SettingsIcon">
                         <button className="iconButton" onClick={handleClick} style={{ transform: rotateCog ? 'rotate(60deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} >
                             <Icon path={mdiCog} size={1.2} color="#7B8990" />
@@ -352,9 +356,9 @@ function Home() {
                             <div className="ChatBoxMessages">
                                 {messages.length > 0 ? messages.filter(message => message.jid === selectedContact.jid).map((message, index) => (
                                     <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'}>
-                                        <p style={{ position: 'relative', top: '15px' }} >{message.message}</p>
+                                        <p style={{ position: 'relative', top: '40px', left: '20px' }} >{message.message}</p>
                                     </div>
-                                )) : <p style={{ position: 'relative', top: '15px' }} >No hay mensajes...</p>}
+                                )) : <p style={{ position: 'relative', top: '40px', left: '20px' }} >No hay mensajes...</p>}
                             </div>
                             <div className="ChatBoxInput">
                                 <button className="buttonClip" >
