@@ -37,7 +37,14 @@
     margin-left: 5%;
 }
 
-.ChatMessages p{
+.ChatInfo{
+    display: flex;
+    justify-content: space-between;
+    margin-right: 20px;
+    align-items: center;
+}
+
+.ChatInfo p{
     margin-top: 3%;
     margin-left: 5%;
 }

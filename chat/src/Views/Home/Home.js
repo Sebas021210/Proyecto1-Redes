@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
+import DropdownStatus from "../../Components/Dropdown/Dropdown";
 import Icon from '@mdi/react';
 import { Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
 import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar, mdiClose, mdiSend, mdiPaperclip } from '@mdi/js';
@@ -322,7 +323,10 @@ function Home() {
                 </div>
                 <div className="ChatMessages">
                     <h4>Chats</h4>
-                    <p> <Icon path={mdiAccountStar} size={1} color="#7B8990" /> {userConnected}</p>
+                    <div className="ChatInfo">
+                        <p> <Icon path={mdiAccountStar} size={1} color="#7B8990" /> {userConnected}</p>
+                        <DropdownStatus />
+                    </div>
                     <div className="ChatList">
                         {/*{console.log('Contacts:', contacts)}*/}
                         {contacts.length > 0 ? contacts.map(contact => (
@@ -331,7 +335,7 @@ function Home() {
                                     <ChatCard
                                         name={contact.name}
                                         status={contact.status}
-                                        jid = {contact.jid}
+                                        jid={contact.jid}
                                     />
                                 </div>
                             </div>
