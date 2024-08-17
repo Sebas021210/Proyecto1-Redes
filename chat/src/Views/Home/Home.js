@@ -178,7 +178,8 @@ function Home() {
                         console.log('🟢 Mensaje de chat recibido:', body);
                         console.log('De:', from);
                         console.log('Cuerpo del mensaje:', body);
-                        addMessageToChat(from, body, 'received');
+                        const normalizedName = from.split('/')[0];
+                        addMessageToChat(normalizedName, body, 'received');
                     } else if (omemoEvent) {
                         //console.log('🔒 Mensaje OMEMO recibido');
                         //addMessageToChat(from, 'Mensaje OMEMO', 'received');
@@ -281,6 +282,7 @@ function Home() {
 
     const addMessageToChat = (jid, message, direction) => {
         setMessages(prevMessages => [...prevMessages, { jid, message, direction }]);
+        console.log('Mensaje añadido:', { jid, message, direction });
     };
 
     const handleSendMessage = () => {
