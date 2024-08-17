@@ -180,12 +180,10 @@ function Home() {
                         console.log('Cuerpo del mensaje:', body);
                         addMessageToChat(from, body, 'received');
                     } else if (omemoEvent) {
-                        console.log('🔒 Mensaje OMEMO recibido');
-                        console.log('De:', from);
-                        addMessageToChat(from, 'Mensaje OMEMO', 'received');
+                        //console.log('🔒 Mensaje OMEMO recibido');
+                        //addMessageToChat(from, 'Mensaje OMEMO', 'received');
                     } else {
                         console.log('❌ Mensaje de chat recibido sin cuerpo');
-                        addMessageToChat(from, 'Mensaje vacío', 'received');
                     }
                 } else {
                     console.log('Mensaje recibido de tipo:', stanza.attrs.type);
@@ -232,12 +230,7 @@ function Home() {
     }, [userConnected, passwordConnected]);
 
     useEffect(() => {
-        const cleanup = fetchData();
-        return () => {
-            if (cleanup && typeof cleanup === 'function') {
-                cleanup();
-            }
-        };
+        fetchData();
     }, [fetchData]);
 
     const handleAddContact = async (event) => {
@@ -382,8 +375,8 @@ function Home() {
                             </div>
                             <div className="ChatBoxMessages">
                                 {messages.length > 0 ? messages.filter(message => message.jid === selectedContact.jid).map((message, index) => (
-                                    <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'}>
-                                        <p style={{ position: 'relative', top: '40px', left: '20px' }} >{message.message}</p>
+                                    <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'} >
+                                        <p>{message.message}</p>
                                     </div>
                                 )) : <p style={{ position: 'relative', top: '40px', left: '20px' }} >No hay mensajes...</p>}
                             </div>
