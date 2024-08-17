@@ -168,12 +168,12 @@ function Home() {
 
             if (stanza.is('message')) {
                 console.log('📩 Stanza de tipo mensaje recibida');
-                
+
                 if (!stanza.attrs.type || stanza.attrs.type === 'chat' || stanza.attrs.type === 'normal') {
                     const from = stanza.attrs.from;
                     const body = stanza.getChildText('body');
                     const omemoEvent = stanza.getChild('event', 'http://jabber.org/protocol/pubsub#event');
-        
+
                     if (body) {
                         console.log('🟢 Mensaje de chat recibido:', body);
                         console.log('De:', from);
@@ -199,10 +199,21 @@ function Home() {
                 const contactsList = query.getChildren('item').map(item => ({
                     name: item.attrs.name || item.attrs.jid.split('@')[0],
                     jid: item.attrs.jid,
-                    status: 'Offline'
+                    status: 'Offline',
+                    customStatus: ''
                 }));
 
                 setContacts(contactsList);
+            } else if (stanza.is('presence')) {
+                const from = stanza.attrs.from.split('/')[0];
+                const show = stanza.getChildText('show') || 'chat';
+                const status = stanza.getChildText('status') || '';
+
+                setContacts(prevContacts =>
+                    prevContacts.map(contact =>
+                        contact.jid === from ? { ...contact, status: show, customStatus: status } : contact
+                    )
+                );
             }
         });
 
@@ -361,6 +372,7 @@ function Home() {
                                     <ChatCard
                                         name={contact.name}
                                         status={contact.status}
+                                        customStatus={contact.customStatus}
                                         jid={contact.jid}
                                     />
                                 </div>

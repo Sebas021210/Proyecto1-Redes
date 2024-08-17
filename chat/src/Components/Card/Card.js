@@ -44,12 +44,15 @@ function ChatCard(props) {
                 <Typography variant="subtitle2" color="text.secondary">
                     {props.status}
                 </Typography>
+                <Typography variant="subtitle2" color="text.secondary">
+                    {props.customStatus}
+                </Typography>
 
                 <BootstrapDialog
                     onClose={handleClose}
                     aria-labelledby="customized-dialog-title"
                     open={open}
-                    sx={{ '& .MuiDialog-paper': { width: '800px', height: '200px' } }}
+                    sx={{ '& .MuiDialog-paper': { width: '800px', height: '240px' } }}
                 >
                     <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
                         Información del contacto
@@ -75,6 +78,9 @@ function ChatCard(props) {
                         </Typography>
                         <Typography gutterBottom>
                             Status: {props.status}
+                        </Typography>
+                        <Typography gutterBottom>
+                            Mensaje de estado: {props.customStatus}
                         </Typography>
                     </DialogContent>
                 </BootstrapDialog>
