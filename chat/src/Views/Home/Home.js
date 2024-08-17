@@ -136,7 +136,7 @@ function Home() {
 
                 await xmppClient.send(subscribePresence);
                 console.log('🟢 Contacto agregado:', username);
-                fetchContacts();
+                fetchData();
             } catch (err) {
                 console.error('❌ Error al agregar contacto:', err.toString());
             } finally {
@@ -151,7 +151,7 @@ function Home() {
         }
     }
 
-    const fetchContacts = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         const xmppClient = client({
             service: 'ws://alumchat.lol:7070/ws/',
             domain: 'alumchat.lol',
@@ -166,7 +166,31 @@ function Home() {
         xmppClient.on('stanza', stanza => {
             console.log('🔄 Stanza recibida:', stanza.toString());
 
-            if (stanza.is('iq') && stanza.attrs.id === 'getRoster1' && stanza.attrs.type === 'result') {
+            if (stanza.is('message')) {
+                console.log('📩 Stanza de tipo mensaje recibida');
+                
+                if (!stanza.attrs.type || stanza.attrs.type === 'chat' || stanza.attrs.type === 'normal') {
+                    const from = stanza.attrs.from;
+                    const body = stanza.getChildText('body');
+                    const omemoEvent = stanza.getChild('event', 'http://jabber.org/protocol/pubsub#event');
+        
+                    if (body) {
+                        console.log('🟢 Mensaje de chat recibido:', body);
+                        console.log('De:', from);
+                        console.log('Cuerpo del mensaje:', body);
+                        addMessageToChat(from, body, 'received');
+                    } else if (omemoEvent) {
+                        console.log('🔒 Mensaje OMEMO recibido');
+                        console.log('De:', from);
+                        addMessageToChat(from, 'Mensaje OMEMO', 'received');
+                    } else {
+                        console.log('❌ Mensaje de chat recibido sin cuerpo');
+                        addMessageToChat(from, 'Mensaje vacío', 'received');
+                    }
+                } else {
+                    console.log('Mensaje recibido de tipo:', stanza.attrs.type);
+                }
+            } else if (stanza.is('iq') && stanza.attrs.id === 'getRoster1' && stanza.attrs.type === 'result') {
                 const query = stanza.getChild('query', 'jabber:iq:roster');
                 if (!query) {
                     console.error('❌ No se encontró el elemento <query> en la respuesta.');
@@ -179,27 +203,21 @@ function Home() {
                     status: 'Offline'
                 }));
 
-                //console.log('Contacts:', contactsList);
                 setContacts(contactsList);
-
-                xmppClient.stop();
             }
         });
 
         xmppClient.on('online', async () => {
             console.log('🟢 Conectado como', xmppClient.jid.toString());
+            await xmppClient.send(xml('presence'));
 
-            try {
-                const getRosterIQ = xml(
-                    'iq',
-                    { type: 'get', id: 'getRoster1' },
-                    xml('query', { xmlns: 'jabber:iq:roster' })
-                );
+            const getRosterIQ = xml(
+                'iq',
+                { type: 'get', id: 'getRoster1' },
+                xml('query', { xmlns: 'jabber:iq:roster' })
+            );
 
-                await xmppClient.send(getRosterIQ);
-            } catch (err) {
-                console.error('❌ Error al enviar IQ para obtener el roster:', err.toString());
-            }
+            await xmppClient.send(getRosterIQ);
         });
 
         try {
@@ -207,11 +225,20 @@ function Home() {
         } catch (err) {
             console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
         }
+
+        return () => {
+            xmppClient.stop()
+        }
     }, [userConnected, passwordConnected]);
 
     useEffect(() => {
-        fetchContacts();
-    }, [fetchContacts]);
+        const cleanup = fetchData();
+        return () => {
+            if (cleanup && typeof cleanup === 'function') {
+                cleanup();
+            }
+        };
+    }, [fetchData]);
 
     const handleAddContact = async (event) => {
         event.preventDefault();

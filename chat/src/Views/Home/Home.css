@@ -177,3 +177,20 @@
     padding: 0.5em 1em 1em 1em;
     box-sizing: border-box;
 }
+
+@media screen and (max-width: 1500px) {
+    .ChatBox{
+        width: 85vh;
+    }
+
+    .ChatBoxInput textarea{
+        width: 85%;
+    }
+
+    .ChatBoxInput textarea::placeholder{
+        position: absolute;
+        top: 40%;
+        left: 17%;
+        transform: translate(-50%, -50%);
+    }
+}
