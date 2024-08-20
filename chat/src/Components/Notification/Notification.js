@@ -3,7 +3,7 @@ import Icon from '@mdi/react';
 import { mdiBell, mdiBellBadge } from '@mdi/js';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-//import { client, xml } from '@xmpp/client';
+import { client, xml } from '@xmpp/client';
 
 const DialogNotification = styled(Dialog)(({ theme }) => ({
     '& .MuiDialog-paper': {
@@ -15,6 +15,8 @@ const DialogNotification = styled(Dialog)(({ theme }) => ({
 
 function Notification({ notifications, setNotifications }) {
     const [openDialog, setOpenDialog] = useState(false);
+    const userConnected = localStorage.getItem('user');
+    const passwordConnected = localStorage.getItem('password');
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -25,14 +27,54 @@ function Notification({ notifications, setNotifications }) {
     };
 
     const handleAccept = (index) => {
-        setNotifications(prev => prev.filter((_, i) => i !== index));
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
+
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+
+        xmppClient.on('online', address => {
+            const acceptPresence = xml('presence', { to: notifications[index].from, type: 'subscribed' });
+            xmppClient.send(acceptPresence);
+            console.log('Se ha aceptado la solicitud de amistad de', notifications[index].from);
+        });
+
+        try {
+            xmppClient.start();
+        } catch (err) {
+            console.error('❌', err.toString());
+        }
     };
 
     const handleReject = (index) => {
-        setNotifications(prev => prev.filter((_, i) => i !== index));
-    };
+        const xmppClient = client({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: userConnected,
+            password: passwordConnected,
+        });
 
-    console.log('Rendering notifications:', notifications);
+        xmppClient.on('error', err => {
+            console.error('❌', err.toString());
+        });
+
+        xmppClient.on('online', address => {
+            const rejectPresence = xml('presence', { to: notifications[index].from, type: 'unsubscribed' });
+            xmppClient.send(rejectPresence);
+            console.log('Se ha rechazado la solicitud de amistad de', notifications[index].from);
+        });
+
+        try {
+            xmppClient.start();
+        } catch (err) {
+            console.error('❌', err.toString());
+        }
+    };
 
     return (
         <div>

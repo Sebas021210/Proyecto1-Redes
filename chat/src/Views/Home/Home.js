@@ -210,7 +210,13 @@ function Home() {
                 const message = stanza.getChildText('status') || 'Solicitud de contacto';
                 console.log('🟢 Solicitud de contacto:', from, message);
 
-                setNotifications(prevNotifications => [...prevNotifications, { from, message }]);
+                setNotifications(prevNotifications => {
+                    const alreadyExists = prevNotifications.some(notification => notification.from === from);
+                    if (!alreadyExists) {
+                        return [...prevNotifications, { from, message }];
+                    }
+                    return prevNotifications;
+                });
             } else if (stanza.is('presence')) {
                 const from = stanza.attrs.from.split('/')[0];
                 const show = stanza.getChildText('show') || 'chat';
