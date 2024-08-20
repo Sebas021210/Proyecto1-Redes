@@ -13,9 +13,8 @@ const DialogNotification = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-function Notification(props) {
+function Notification({ notifications, setNotifications }) {
     const [openDialog, setOpenDialog] = useState(false);
-    const [hasNotifications, /*setHasNotifications*/] = useState(true);
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -25,32 +24,41 @@ function Notification(props) {
         setOpenDialog(false);
     };
 
+    const handleAccept = (index) => {
+        setNotifications(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleReject = (index) => {
+        setNotifications(prev => prev.filter((_, i) => i !== index));
+    };
+
+    console.log('Rendering notifications:', notifications);
+
     return (
         <div>
             <button className="iconButton" onClick={handleOpenDialog}>
-                <Icon path={hasNotifications ? mdiBellBadge : mdiBell} size={1.2} color="#7B8990" />
+                <Icon path={notifications.length > 0 ? mdiBellBadge : mdiBell} size={1.2} color="#7B8990" />
             </button>
-            <DialogNotification
-                open={openDialog}
-                onClose={handleCloseDialog}
-            >
+            <DialogNotification open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>Notificaciones</DialogTitle>
                 <DialogContent>
-                    {hasNotifications ? (
-                        <Card sx={{ maxWidth: 500 }}>
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="div">
-                                    {props.suscriptionName}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {props.suscriptionMessage}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button size="small" style={{ color: '#000' }}>Aceptar</Button>
-                                <Button size="small" style={{ color: '#000' }}>Rechazar</Button>
-                            </CardActions>
-                        </Card>
+                    {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                            <Card key={index} sx={{ maxWidth: 500 }} style={{marginBottom: '10px'}} >
+                                <CardContent>
+                                    <Typography gutterBottom variant="h5" component="div">
+                                        {notification.from}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {notification.message}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions>
+                                    <Button size="small" style={{ color: '#000' }} onClick={() => handleAccept(index)}>Aceptar</Button>
+                                    <Button size="small" style={{ color: '#000' }} onClick={() => handleReject(index)}>Rechazar</Button>
+                                </CardActions>
+                            </Card>
+                        ))
                     ) : (
                         <DialogContentText>
                             No hay notificaciones por el momento.
