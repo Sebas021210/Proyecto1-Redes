@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Icon from '@mdi/react';
 import { mdiBell, mdiBellBadge } from '@mdi/js';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Card, CardActions, CardContent, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import notificationSound from '../../Assets/notification.mp3';
 import { client, xml } from '@xmpp/client';
 
 const DialogNotification = styled(Dialog)(({ theme }) => ({
@@ -15,6 +16,7 @@ const DialogNotification = styled(Dialog)(({ theme }) => ({
 
 function Notification({ notifications, setNotifications }) {
     const [openDialog, setOpenDialog] = useState(false);
+    const [hasNotifications, setHasNotifications] = useState(notifications.length > 0);
     const userConnected = localStorage.getItem('user');
     const passwordConnected = localStorage.getItem('password');
 
@@ -24,6 +26,20 @@ function Notification({ notifications, setNotifications }) {
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+    };
+
+    useEffect(() => {
+        if (notifications.length > 0) {
+            setHasNotifications(true);
+            playNotificationSound();
+        } else {
+            setHasNotifications(false);
+        }
+    }, [notifications]);
+
+    const playNotificationSound = () => {
+        const audio = new Audio(notificationSound);
+        audio.play();
     };
 
     const handleAccept = (index) => {
@@ -79,12 +95,12 @@ function Notification({ notifications, setNotifications }) {
     return (
         <div>
             <button className="iconButton" onClick={handleOpenDialog}>
-                <Icon path={notifications.length > 0 ? mdiBellBadge : mdiBell} size={1.2} color="#7B8990" />
+                <Icon path={hasNotifications ? mdiBellBadge : mdiBell} size={1.2} color="#7B8990" />
             </button>
             <DialogNotification open={openDialog} onClose={handleCloseDialog}>
                 <DialogTitle>Notificaciones</DialogTitle>
                 <DialogContent>
-                    {notifications.length > 0 ? (
+                    {hasNotifications ? (
                         notifications.map((notification, index) => (
                             <Card key={index} sx={{ maxWidth: 500 }} style={{marginBottom: '10px'}} >
                                 <CardContent>

@@ -6,6 +6,7 @@ import Notification from "../../Components/Notification/Notification";
 import Icon from '@mdi/react';
 import { Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField } from '@mui/material';
 import { mdiMessageText, mdiContacts, mdiAccountGroup, mdiCog, mdiAccountStar, mdiClose, mdiSend, mdiPaperclip } from '@mdi/js';
+import messageSound from '../../Assets/message.mp3';
 import { client, xml } from '@xmpp/client';
 import './Home.css';
 
@@ -181,6 +182,8 @@ function Home() {
                         console.log('Cuerpo del mensaje:', body);
                         const normalizedName = from.split('/')[0];
                         addMessageToChat(normalizedName, body, 'received');
+                        const audio = new Audio(messageSound);
+                        audio.play();
                     } else if (omemoEvent) {
                         //console.log('🔒 Mensaje OMEMO recibido');
                         //addMessageToChat(from, 'Mensaje OMEMO', 'received');
