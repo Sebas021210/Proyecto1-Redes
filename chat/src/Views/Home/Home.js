@@ -18,6 +18,8 @@ function Home() {
     const [selectedContact, setSelectedContact] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [suscriptionName, setSuscriptionName] = useState('');
+    const [suscriptionMessage, setSuscriptionMessage] = useState('');
     const open = Boolean(anchorEl);
 
     const userConnected = localStorage.getItem('user');
@@ -204,6 +206,13 @@ function Home() {
                 }));
 
                 setContacts(contactsList);
+            } else if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
+                const from = stanza.attrs.from;
+                const message = stanza.getChildText('status') || 'Solicitud de contacto';
+                console.log('🟢 Solicitud de contacto:', from, message);
+
+                setSuscriptionName(from);
+                setSuscriptionMessage(message);
             } else if (stanza.is('presence')) {
                 const from = stanza.attrs.from.split('/')[0];
                 const show = stanza.getChildText('show') || 'chat';
@@ -214,7 +223,7 @@ function Home() {
                         contact.jid === from ? { ...contact, status: show, customStatus: status } : contact
                     )
                 );
-            }
+            } 
         });
 
         xmppClient.on('online', async () => {
@@ -339,7 +348,10 @@ function Home() {
                         </button>
                     </div>
                     <div className="NotificationIcon">
-                        <Notification />
+                        <Notification 
+                            suscriptionName={suscriptionName}
+                            suscriptionMessage={suscriptionMessage}
+                        />
                     </div>
                     <div className="SettingsIcon">
                         <button className="iconButton" onClick={handleClick} style={{ transform: rotateCog ? 'rotate(60deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} >

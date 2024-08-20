@@ -13,9 +13,9 @@ const DialogNotification = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-function Notification() {
+function Notification(props) {
     const [openDialog, setOpenDialog] = useState(false);
-    const [hasNotifications, /*setHasNotifications*/] = useState(false);
+    const [hasNotifications, /*setHasNotifications*/] = useState(true);
 
     const handleOpenDialog = () => {
         setOpenDialog(true);
@@ -40,10 +40,10 @@ function Notification() {
                         <Card sx={{ maxWidth: 500 }}>
                             <CardContent>
                                 <Typography gutterBottom variant="h5" component="div">
-                                    sol21826-test1
+                                    {props.suscriptionName}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    sol21826-test1 quiere agregarte como contacto.
+                                    {props.suscriptionMessage}
                                 </Typography>
                             </CardContent>
                             <CardActions>
