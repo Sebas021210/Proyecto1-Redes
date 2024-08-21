@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatCard from "../../Components/Card/Card";
 import DropdownStatus from "../../Components/Dropdown/Dropdown";
@@ -19,6 +19,8 @@ function Home() {
     const [selectedContact, setSelectedContact] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [, setSelectedFile] = useState(null);
+    const fileInputRef = useRef(null);
     const [notifications, setNotifications] = useState([]);
     const open = Boolean(anchorEl);
 
@@ -317,6 +319,62 @@ function Home() {
         setNewMessage('');
     };
 
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        setSelectedFile(file);
+
+        if (!file || !selectedContact) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const arrayBuffer = event.target.result;
+
+            const xmppClient = client({
+                service: 'ws://alumchat.lol:7070/ws/',
+                domain: 'alumchat.lol',
+                username: userConnected,
+                password: passwordConnected,
+            });
+
+            xmppClient.on('error', err => {
+                console.error('❌', err.toString());
+            });
+
+            xmppClient.on('online', async () => {
+                try {
+                    const fileStanza = xml(
+                        'message',
+                        { type: 'chat', to: selectedContact.jid },
+                        xml('body', {}, `Archivo enviado: ${file.name}`),
+                        xml('attachment', { xmlns: 'urn:xmpp:bob', cid: `cid:${file.name}` }, arrayBuffer)
+                    );
+
+                    await xmppClient.send(fileStanza);
+                    console.log('🟢 Archivo enviado:', file.name);
+                    addMessageToChat(selectedContact.jid, `Archivo enviado: ${file.name}`, 'sent');
+                } catch (err) {
+                    console.error('❌ Error al enviar archivo:', err.toString());
+                } finally {
+                    xmppClient.stop();
+                }
+            });
+
+            try {
+                await xmppClient.start();
+            } catch (err) {
+                console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+    };
+
+    const handleButtonClipClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
     return (
         <div className="Home">
             <div className="Navbar"></div>
@@ -415,7 +473,13 @@ function Home() {
                                 )) : <p style={{ position: 'relative', top: '40px', left: '20px' }} >No hay mensajes...</p>}
                             </div>
                             <div className="ChatBoxInput">
-                                <button className="buttonClip" >
+                                <button className="buttonClip" onClick={handleButtonClipClick} >
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        style={{ display: 'none' }}
+                                        onChange={handleFileChange}
+                                    />
                                     <Icon path={mdiPaperclip} size={1} />
                                 </button>
                                 <textarea placeholder="Escribe tu mensaje aquí..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)}></textarea>
