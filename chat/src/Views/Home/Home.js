@@ -484,39 +484,39 @@ function Home() {
                             </div>
                         )) : <p>No se encontraron contactos...</p>}
                     </div>
-                    {selectedContact && (
-                        <div className="ChatBox">
-                            <div className="ChatBoxHeader">
-                                <h5>{selectedContact.name}</h5>
-                                <button onClick={handleCardClose}>
-                                    <Icon path={mdiClose} size={1} />
-                                </button>
-                            </div>
-                            <div className="ChatBoxMessages">
-                                {messages.length > 0 ? messages.filter(message => message.jid === selectedContact.jid).map((message, index) => (
-                                    <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'} >
-                                        <p>{message.message}</p>
-                                    </div>
-                                )) : <p style={{ position: 'relative', top: '40px', left: '20px' }} >No hay mensajes...</p>}
-                            </div>
-                            <div className="ChatBoxInput">
-                                <button className="buttonClip" onClick={handleButtonClipClick} >
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        style={{ display: 'none' }}
-                                        onChange={handleFileChange}
-                                    />
-                                    <Icon path={mdiPaperclip} size={1} />
-                                </button>
-                                <textarea placeholder="Escribe tu mensaje aquí..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)}></textarea>
-                                <button className="buttonSend" onClick={handleSendMessage} >
-                                    <Icon path={mdiSend} size={1} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </div>
+                {selectedContact && (
+                    <div className="ChatBox">
+                        <div className="ChatBoxHeader">
+                            <h5>{selectedContact.name}</h5>
+                            <button onClick={handleCardClose}>
+                                <Icon path={mdiClose} size={1} />
+                            </button>
+                        </div>
+                        <div className="ChatBoxMessages">
+                            {messages.length > 0 ? messages.filter(message => message.jid === selectedContact.jid).map((message, index) => (
+                                <div key={index} className={message.direction === 'sent' ? 'ChatMessageSent' : 'ChatMessageReceived'} >
+                                    <p>{message.message}</p>
+                                </div>
+                            )) : <p style={{ position: 'relative', top: '40px', left: '20px' }} >No hay mensajes...</p>}
+                        </div>
+                        <div className="ChatBoxInput">
+                            <button className="buttonClip" onClick={handleButtonClipClick} >
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChange}
+                                />
+                                <Icon path={mdiPaperclip} size={1} />
+                            </button>
+                            <textarea placeholder="Escribe tu mensaje aquí..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)}></textarea>
+                            <button className="buttonSend" onClick={handleSendMessage} >
+                                <Icon path={mdiSend} size={1} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -29,6 +29,8 @@
     top: 50%;
     left: 19%;
     transform: translate(-50%, -50%);
+    overflow-y: scroll;
+    scrollbar-width: thin;
 }
 
 .ChatMessages h4{
@@ -103,7 +105,7 @@
     height: 95vh;
     width: 118vh;
     position: absolute;
-    margin-left: 100%;
+    margin-left: 34%;
     bottom: 0%;
     background-color: #EFEAE2;
 }
@@ -131,6 +133,9 @@
     width: 100%;
     position: relative;
     bottom: 4%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: thin;
 }
 
 .ChatBoxInput{
