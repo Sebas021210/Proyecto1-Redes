@@ -322,35 +322,35 @@ function Home() {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedFile(file);
-
+    
         if (!file || !selectedContact) return;
-
+    
         const reader = new FileReader();
         reader.onload = async (event) => {
-            const arrayBuffer = event.target.result;
-
+            const base64Data = event.target.result.split(',')[1];
+            const mimeType = file.type;
+    
             const xmppClient = client({
                 service: 'ws://alumchat.lol:7070/ws/',
                 domain: 'alumchat.lol',
                 username: userConnected,
                 password: passwordConnected,
             });
-
+    
             xmppClient.on('error', err => {
                 console.error('❌', err.toString());
             });
-
+    
             xmppClient.on('online', async () => {
                 try {
                     const fileStanza = xml(
                         'message',
                         { type: 'chat', to: selectedContact.jid },
-                        xml('body', {}, `Archivo enviado: ${file.name}`),
-                        xml('attachment', { xmlns: 'urn:xmpp:bob', cid: `cid:${file.name}` }, arrayBuffer)
+                        xml('body', { xmlns: 'urn:xmpp:bob', 'mime-type': mimeType }, `${base64Data} mime-type=${mimeType}`)
                     );
-
+    
                     await xmppClient.send(fileStanza);
-                    console.log('🟢 Archivo enviado:', file.name);
+                    console.log('🟢 Archivo codificado:', base64Data);
                     addMessageToChat(selectedContact.jid, `Archivo enviado: ${file.name}`, 'sent');
                 } catch (err) {
                     console.error('❌ Error al enviar archivo:', err.toString());
@@ -358,16 +358,16 @@ function Home() {
                     xmppClient.stop();
                 }
             });
-
+    
             try {
                 await xmppClient.start();
             } catch (err) {
                 console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
             }
         };
-
-        reader.readAsArrayBuffer(file);
-    };
+    
+        reader.readAsDataURL(file);
+    };    
 
     const handleButtonClipClick = () => {
         if (fileInputRef.current) {
