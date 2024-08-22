@@ -181,11 +181,38 @@ function Home() {
                     if (body) {
                         console.log('🟢 Mensaje de chat recibido:', body);
                         console.log('De:', from);
-                        console.log('Cuerpo del mensaje:', body);
-                        const normalizedName = from.split('/')[0];
-                        addMessageToChat(normalizedName, body, 'received');
-                        const audio = new Audio(messageSound);
-                        audio.play();
+
+                        const mimeTypePattern = /mime-type=([^ ]+)/;
+                        const base64Pattern = /^([a-zA-Z0-9+/=]+)(?: mime-type=([^ ]+))?$/;
+                        const base64Match = body.match(base64Pattern);
+                        const mimeTypeMatch = body.match(mimeTypePattern);
+
+                        if (base64Match && mimeTypeMatch) {
+                            const base64Data = base64Match[1];
+                            const mimeType = mimeTypeMatch[1];
+
+                            console.log('📎 Archivo recibido:', base64Data);
+                            console.log('📝 Tipo MIME:', mimeType);
+
+                            const arrayBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                            const blob = new Blob([arrayBuffer], { type: mimeType });
+                            const downloadUrl = URL.createObjectURL(blob);
+
+                            if (mimeType.startsWith('image/')) {
+                                const imageUrl = downloadUrl;
+                                addMessageToChat(from.split('/')[0], `Imagen recibida: ${imageUrl}`, 'received');
+                            } else {
+                                addMessageToChat(from.split('/')[0], `Archivo recibido: ${downloadUrl}`, 'received');
+                            }
+
+                            const audio = new Audio(messageSound);
+                            audio.play();
+                        } else {
+                            const normalizedName = from.split('/')[0];
+                            addMessageToChat(normalizedName, body, 'received');
+                            const audio = new Audio(messageSound);
+                            audio.play();
+                        }
                     } else if (omemoEvent) {
                         //console.log('🔒 Mensaje OMEMO recibido');
                         //addMessageToChat(from, 'Mensaje OMEMO', 'received');
@@ -232,7 +259,7 @@ function Home() {
                         contact.jid === from ? { ...contact, status: show, customStatus: status } : contact
                     )
                 );
-            } 
+            }
         });
 
         xmppClient.on('online', async () => {
@@ -322,25 +349,25 @@ function Home() {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedFile(file);
-    
+
         if (!file || !selectedContact) return;
-    
+
         const reader = new FileReader();
         reader.onload = async (event) => {
             const base64Data = event.target.result.split(',')[1];
             const mimeType = file.type;
-    
+
             const xmppClient = client({
                 service: 'ws://alumchat.lol:7070/ws/',
                 domain: 'alumchat.lol',
                 username: userConnected,
                 password: passwordConnected,
             });
-    
+
             xmppClient.on('error', err => {
                 console.error('❌', err.toString());
             });
-    
+
             xmppClient.on('online', async () => {
                 try {
                     const fileStanza = xml(
@@ -348,7 +375,7 @@ function Home() {
                         { type: 'chat', to: selectedContact.jid },
                         xml('body', { xmlns: 'urn:xmpp:bob', 'mime-type': mimeType }, `${base64Data} mime-type=${mimeType}`)
                     );
-    
+
                     await xmppClient.send(fileStanza);
                     console.log('🟢 Archivo codificado:', base64Data);
                     addMessageToChat(selectedContact.jid, `Archivo enviado: ${file.name}`, 'sent');
@@ -358,16 +385,16 @@ function Home() {
                     xmppClient.stop();
                 }
             });
-    
+
             try {
                 await xmppClient.start();
             } catch (err) {
                 console.error('❌ Error al iniciar el cliente XMPP:', err.toString());
             }
         };
-    
+
         reader.readAsDataURL(file);
-    };    
+    };
 
     const handleButtonClipClick = () => {
         if (fileInputRef.current) {
@@ -413,8 +440,8 @@ function Home() {
                         </button>
                     </div>
                     <div className="NotificationIcon">
-                        {console.log('Notifications:', notifications)}
-                        <Notification 
+                        {/*{console.log('Notifications:', notifications)}*/}
+                        <Notification
                             notifications={notifications}
                             setNotifications={setNotifications}
                         />
