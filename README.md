@@ -1,64 +1,64 @@
 # Chat App - React & XMPP.js
 
-Este proyecto consiste en implementar un cliente de mensajería instanánea que soporte el protocolo XMPP, fue desarrollado en React utilizando la biblioteca XMPP.js.
+This project involves implementing an instant messaging client that supports the XMPP protocol. It was developed in React using the XMPP.js library.
 
-## Características
+## Features
 
-- **Interfaz de Usuario**: Interfaz simple y fácil de usar, con una lista de contactos y un área de chat.
-- **Lista de Contactos**: Agrega y visualiza contactos en tu lista con su información.
-- **Mensajería en Tiempo Real**: Envía y recibe mensajes instantáneamente utilizando el protocolo XMPP.
-- **Manejo de Estado de Presencia**: Actualiza y muestra el estado de presencia (disponible, ausente, ocupado, etc.) para cada contacto.
-- **Envío de Archivos**: Permite el envío y recepción de archivos codificados en base64, con el tipo MIME especificado.
-- **Notificaciones**: Notificaciones visuales y sonoras cuando se recibe un nuevo mensaje o una solicitud de contacto.
-- **Manejo de Solicitudes de Contacto**: Permite aceptar o rechazar solicitudes de contacto y manejar múltiples notificaciones.
+- **User Interface**: Simple and user-friendly interface, with a contact list and a chat area.
+- **Contact List**: Add and view contacts in your list with their information.
+- **Real-Time Messaging**: Send and receive messages instantly using the XMPP protocol.
+- **Presence State Management**: Update and display presence status (available, away, busy, etc.) for each contact.
+- **File Transfer**: Supports sending and receiving files encoded in base64, with the specified MIME type.
+- **Notifications**: Visual and sound notifications when a new message or contact request is received.
+- **Contact Request Management**: Accept or reject contact requests and handle multiple notifications.
 
-## Funcionalidades Implementadas
+## Implemented Functionalities
 
-1. **Autenticación y Conexión**: Los usuarios pueden iniciar sesión en su cuenta XMPP y conectarse al servidor.
-2. **Registro y Eliminación de Cuentas**: Crea y elimina cuentas de usuario.
-3. **Gestión de Contactos**: Visualización de la lista de contactos con sus nombres y estados actuales.
-4. **Envío de Mensajes**: Los usuarios pueden enviar mensajes de texto y ver los mensajes recibidos en tiempo real.
-5. **Envío y Recepción de Archivos**: Soporte para el envío de archivos en formato base64 con identificación del tipo MIME.
-6. **Notificaciones**: Sistema de notificaciones para alertar al usuario sobre nuevos mensajes o solicitudes de contacto.
-7. **Estados de Presencia**: Los usuarios pueden cambiar su estado de presencia y ver el estado de otros usuarios.
+1. **Authentication and Connection**: Users can log in to their XMPP account and connect to the server.
+2. **Account Registration and Deletion**: Create and delete user accounts.
+3. **Contact Management**: View the contact list with their names and current statuses.
+4. **Message Sending**: Users can send text messages and see messages received in real-time.
+5. **File Transfer**: Support for sending files in base64 format with MIME type identification.
+6. **Notifications**: Notification system to alert the user about new messages or contact requests.
+7. **Presence States**: Users can change their presence state and see the state of other users.
 
-## Requisitos
+## Requirements
 
-Antes de instalar y ejecutar la aplicación, asegúrate de tener lo siguiente:
+Before installing and running the application, make sure you have the following:
 
-- **Node.js**: Necesitas tener Node.js instalado en tu sistema. Puedes verificar si ya está instalado ejecutando `node -v` en tu terminal. Si no lo tienes, sigue las instrucciones en la [página oficial de Node.js](https://nodejs.org/) para instalarlo.
+- **Node.js**: You need to have Node.js installed on your system. You can check if it is installed by running `node -v` in your terminal. If you don't have it, follow the instructions on the [official Node.js page](https://nodejs.org/) to install it.
 
-## Instalación
+## Installation
 
-Sigue los pasos a continuación para instalar y ejecutar la aplicación en tu dispositivo:
+Follow the steps below to install and run the application on your device:
 
-1. **Clonar el Repositorio**
+1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/Sebas021210/Proyecto1-Redes.git
    cd chat
    ```
-2. **Instalar Dependencias**
-    Una vez que tengas Node.js instalado, ejecuta el siguiente comando para instalar todas las dependencias del proyecto:
+2. **Install Dependencies**
+   Once you have Node.js installed, run the following command to install all project dependencies:
    ```bash
    npm install
    ```
-3. **Iniciar la Aplicación**
+3. **Start the Application**
    ```bash
    npm start
    ```
 
-## Uso
+## Usage
 
-- Iniciar Sesión: Introduce tu nombre de usuario y contraseña para conectarte al servidor XMPP.
-- Registro Cuenta: Introduce tu nombre de usuario, nombre completo, correo electrónico y contraseña para crear tu usuario en el servidor XMPP.
-- Cerrar Sesión y Eliminar Cuenta: Haz clic en el icono de configuraciones en la parte superior para cerrar sesión o eliminar la cuenta.
-- Agregar Contacto: Haz clic en el icono de nuevo contacto e introduce el nombre de usuario.
-- Información Contacto: Haz clic en el icono de opciones en la lista de contacto y se mostrará la información del contacto seleccionado.
-- Enviar Mensajes: Selecciona un contacto de la lista y envía mensajes usando el cuadro de entrada.
-- Enviar Archivos: Haz clic en el icono de clip para adjuntar y enviar un archivo.
-- Cambiar Estado: Haz clic en el icono de configuración de estado y cambia tu estado de presencia usando el menú desplegable o agregando un mensaje de estado.
-- Manejar Notificaciones: Responde a solicitudes de contacto directamente desde el icono de notificaciones.
+- Log In: Enter your username and password to connect to the XMPP server.
+- Account Registration: Enter your username, full name, email, and password to create your user on the XMPP server.
+- Log Out and Delete Account: Click on the settings icon at the top to log out or delete the account.
+- Add Contact: Click on the new contact icon and enter the username.
+- Contact Information: Click on the options icon in the contact list to view the selected contact's information.
+- Send Messages: Select a contact from the list and send messages using the input box.
+- Send Files: Click on the clip icon to attach and send a file.
+- Change Status: Click on the status settings icon and change your presence status using the dropdown menu or by adding a status message.
+- Manage Notifications: Respond to contact requests directly from the notifications icon.
 
-## Autor
+## Author
 Sebastián José Solorzano Pérez
